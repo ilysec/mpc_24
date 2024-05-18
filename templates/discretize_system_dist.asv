@@ -18,7 +18,7 @@ function [Ad, Bd, Bd_d] = discretize_system_dist(Ac, Bc, Bd_c, params)
     sys_disc = c2d(sys_cont, params.model.TimeStep, 'zoh');
     
     Ad = sys_disc.A;
-    Bd = sys_disc.B(:, 1:(size(Bc,2)));
-    Bd_d = sys_disc.B(:, size(Bc,2)+1:(size(Bc,2)+size(Bd_c,2)));
+    Bd = sys_disc.B(:, 1:(size(Bc,1)-1));
+    Bd_d = sys_disc.B(:, size(Bc,2):(size(Bc,2)+size(Bd_c,1)));
 
 end
