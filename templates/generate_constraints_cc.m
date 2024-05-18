@@ -22,7 +22,7 @@ function [H_u, h_u, H_x, h_x] = generate_constraints_cc(params)
           -1 0 0; 
            0 1 0; 
            0 -1 0; 
-           0 0 1; 
+           0 0 1;
            0 0 -1];
     h_x = [
         params.constraints.T1Max; 
