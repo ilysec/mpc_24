@@ -43,14 +43,14 @@ classdef MPC_TE
 
             constraints = [constraints, ...
                 X(:,N+1) == zeros(nx, 1), ...
-                constraints, X(:,1) == X0];
+                X(:,1) == X0];
 
             opts = sdpsettings('verbose', 1, 'solver', 'quadprog');
             obj.yalmip_optimizer = optimizer(constraints, objective, opts, X0, {U(:,1), objective});
         end
 
         function [u, ctrl_info] = eval(obj, x)
-            % Evaluate control action by solving MPC problem
+            %% Evaluate control action by solving MPC problem
             tic
             [optimizer_out, errorcode] = obj.yalmip_optimizer(x);
             solvetime = toc;
