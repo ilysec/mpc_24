@@ -3,8 +3,8 @@
 3 done  
 4 done  
 5
-6
-7
+6 done
+7 done
 8
 9
 10

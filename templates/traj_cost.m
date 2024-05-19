@@ -8,5 +8,10 @@
 
 function cost = traj_cost(x,u,Q,R)
 
+    cost = 0;
+    for i = 1:size(u,2)
+        cost = cost + x(:,i)'*Q*x(:,i) + u(:,i)'*R*u(:,i);
+    end
+
 end
 

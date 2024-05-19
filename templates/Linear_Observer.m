@@ -20,7 +20,9 @@ classdef Linear_Observer
         end
         
         function x0_est_pred = eval(obj, x0_est, u, y)
-            % x0_est_pred = ...
+             
+            x0_est_pred = obj.params.model.A * x0_est + obj.params.model.B * u + obj.L * -(y - obj.params.model.C * x0_est);
+            
         end
     end
 end
