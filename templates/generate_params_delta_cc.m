@@ -18,4 +18,17 @@ params_delta.model = rmfield(params_delta.model, 'Bd');
 
 % CONTINUE BELOW THIS LINE
 
+d = [params.model.a1o; params.model.a2o; params.model.a3o] * params.exercise.To + params.exercise.RadiationA;
+
+[params_delta.exercise.x_s , params_delta.exercise.u_s] = compute_steady_state(params, d);
+
+params_delta.exercise.InitialConditionA = params_delta.exercise.InitialConditionA - params_delta.exercise.x_s;
+params_delta.exercise.InitialConditionB = params_delta.exercise.InitialConditionB - params_delta.exercise.x_s; 
+params_delta.exercise.InitialConditionC = params_delta.exercise.InitialConditionC - params_delta.exercise.x_s;
+
+params_delta.constraints.InputRHS = params_delta.constraints.InputRHS - params.constraints.InputMatrix * params_delta.exercise.u_s;
+
+params_delta.constraints.StateRHS = params_delta.constraints.StateRHS - params.constraints.StateMatrix * params_delta.exercise.x_s;
+
+
 end
