@@ -64,10 +64,12 @@ function [params] = generate_params_cc()
 
     % CONTINUE BELOW THIS LINE
 
-    [Ac, Bc, Bd_c] = generate_system_cont_cc(params);
+    sys_cont = 
 
-    [params.model.A, params.model.B, params.model.Bd] = discretize_system_dist(Ac, Bc, Bd_c, params);
-
-    [params.constraints.InputMatrix, params.constraints.InputRHS, params.constraints.StateMatrix, params.constraints.StateRHS] = generate_constraints_cc(params);
+    constr = 
+    params.model.StateMatrix = constr.Hu;
+    params.model.StateRHS = ;
+    params.model.InputMatrix = ;
+    params.model.InputRHS = ;
 
 end
