@@ -15,25 +15,21 @@ function [H, h] = lqr_maxPI(Q, R, params)
     hu = params.constraints.InputRHS;
     Hx = params.constraints.StateMatrix;
     hx = params.constraints.StateRHS;
+   
+    [K, ~, ~] = lqr(A, B, Q, R);
+
+    nx = size(A, 1); 
+    nu = size(B, 2); 
+
+    sys = LTISystem('A', A, 'B', B);
     
-    % Compute the LQR gain
-    [K, ~, ~] = dlqr(A, B, Q, R);
-    A_cl = A - B * K;
-
-    stateConstraints = Polyhedron(Hx, hx);
-    inputConstraints = Polyhedron(Hu, hu);
+    sys.x.min = -hx(1:nx); 
+    sys.x.max = hx(1:nx); 
+    sys.u.min = -hu(1:nu);
+    sys.u.max = hu(1:nu);  
     
-    % Define the LTI system
-    model = LTISystem('A', A, 'B', B);
-    model.x.with('setConstraint');
-    model.x.setConstraint = stateConstraints;
-    model.u.with('setConstraint');
-    model.u.setConstraint = inputConstraints;
+    InvSet = sys.invariantSet();
 
-    % Compute the invariant set
-    InvSet = model.invariantSet();
-
-    % Extract the H and h matrices from the polyhedral representation
     H = InvSet.A;
     h = InvSet.b;
 
