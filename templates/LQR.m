@@ -13,12 +13,15 @@ classdef LQR
     
     methods
         function obj = LQR(Q,R,params)
-            % obj.K = ...
+            [K,S,e] = dlqr(params.model.A,params.model.B,Q,R);
+            obj.K = K;
+            
         end
 
         function [u, ctrl_info] = eval(obj,x)
-            % u = ...
-            % ctrl_info = ...
+            u = -obj.K*x;
+            ctrl_info.ctrl_feas = true;
+            
         end
     end
 end
