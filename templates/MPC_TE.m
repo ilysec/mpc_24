@@ -6,24 +6,53 @@
 % Please see the LICENSE file that has been included as part of this package.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 classdef MPC_TE
     properties
         yalmip_optimizer
     end
 
     methods
-        function obj = MPC_TE(Q,R,N,params)
+        function obj = MPC_TE(Q, R, N, params)
+            A = params.model.A;
+            B = params.model.B;
+            Hx = params.constraints.StateMatrix;
+            hx = params.constraints.StateRHS;
+            Hu = params.constraints.InputMatrix;
+            hu = params.constraints.InputRHS;
+            nx = size(A, 1); 
+            nu = size(B, 2); 
+            
+            X = sdpvar(nx, N+1); 
+            U = sdpvar(nu, N); 
+            X0 = sdpvar(nx, 1);
 
-            % ADD STUFF HERE
+            objective = 0;
+            constraints = [];
 
-            opts = sdpsettings('verbose',1,'solver','quadprog');
-            obj.yalmip_optimizer = optimizer(constraints,objective,opts,X0,{U{1} objective});
+            for k = 1:N
+                objective = objective + X(:,k)' * Q * X(:,k) + U(:,k)' * R * U(:,k);
+
+                constraints = [constraints, X(:,k+1) == A * X(:,k) + B * U(:,k)];
+                
+                constraints = [constraints, Hx * X(:,k) <= hx];
+                constraints = [constraints, Hu * U(:,k) <= hu];
+            end
+
+            objective = objective + X(:,N+1)' * Q * X(:,N+1);
+
+            constraints = [constraints, X(:,N+1) == zeros(nx, 1)];
+
+            constraints = [constraints, X(:,1) == X0];
+
+            opts = sdpsettings('verbose', 1, 'solver', 'quadprog');
+            obj.yalmip_optimizer = optimizer(constraints, objective, opts, X0, {U(:,1), objective});
         end
 
-        function [u, ctrl_info] = eval(obj,x)
-            %% evaluate control action by solving MPC problem, e.g.
+        function [u, ctrl_info] = eval(obj, x)
+            % Evaluate control action by solving MPC problem
             tic
-            [optimizer_out,errorcode] = obj.yalmip_optimizer(x);
+            [optimizer_out, errorcode] = obj.yalmip_optimizer(x);
             solvetime = toc;
             [u, objective] = optimizer_out{:};
 
@@ -32,7 +61,7 @@ classdef MPC_TE
                 feasible = false;
             end
 
-            ctrl_info = struct('ctrl_feas',feasible,'objective',objective,'solvetime',solvetime);
+            ctrl_info = struct('ctrl_feas', feasible, 'objective', objective, 'solvetime', solvetime);
         end
     end
 end
