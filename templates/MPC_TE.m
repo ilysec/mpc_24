@@ -33,17 +33,17 @@ classdef MPC_TE
             for k = 1:N
                 objective = objective + X(:,k)' * Q * X(:,k) + U(:,k)' * R * U(:,k);
 
-                constraints = [constraints, X(:,k+1) == A * X(:,k) + B * U(:,k)];
-                
-                constraints = [constraints, Hx * X(:,k) <= hx];
-                constraints = [constraints, Hu * U(:,k) <= hu];
+                constraints = [constraints, ...
+                    X(:,k+1) == A * X(:,k) + B * U(:,k), ...
+                    Hx * X(:,k) <= hx, ...
+                    Hu * U(:,k) <= hu];
             end
 
             objective = objective + X(:,N+1)' * Q * X(:,N+1);
 
-            constraints = [constraints, X(:,N+1) == zeros(nx, 1)];
-
-            constraints = [constraints, X(:,1) == X0];
+            constraints = [constraints, ...
+                X(:,N+1) == zeros(nx, 1), ...
+                constraints, X(:,1) == X0];
 
             opts = sdpsettings('verbose', 1, 'solver', 'quadprog');
             obj.yalmip_optimizer = optimizer(constraints, objective, opts, X0, {U(:,1), objective});
